@@ -6,45 +6,47 @@ import time
 pygame.init()
 pygame.mixer.init()
 
-# create the window
-width = 1400  # Further enlarged window width
-height = 1000  # Further enlarged window height
-screen_size = (width, height)
-screen = pygame.display.set_mode(screen_size)
-pygame.display.set_caption('Car Game')
+# creating the window of the game
+# this are the dimensions of the window where the game is played
+
+width_of_window = 1400  
+height_of_window = 1000  
+screen_dimensions = (width_of_window, height_of_window)
+the_game_screen = pygame.display.set_mode(screen_dimensions)
+pygame.display.set_caption('The Empire Car Racing Game')
 
 # the game colors
-gray = (100, 100, 100)
-green = (76, 208, 56)
-red = (200, 0, 0)
-white = (255, 255, 255)
-yellow = (255, 232, 0)
-black = (0, 0, 0)
+game_road_color = (100, 100, 100)
+the_grass_color = (76, 208, 56)
+game_over_color = (200, 0, 0)
+game_text_color = (255, 255, 255)
+road_lane_marks_color = (255, 232, 0)
+highlighted_text_color = (0, 0, 0)
 
 # road and marker sizes
-road_width = 900  # Adjusted for larger window
-marker_width = 10
-marker_height = 50
+game_road_width = 900  # Adjusted for larger window
+road_lane_marker_width = 10
+road_lane_marker_height = 50
 
 # lane coordinates (equally spaced)
-lane_width = road_width / 3  # Equal lane width
-left_lane = width / 2 - road_width / 3  # Properly positioned left lane
-center_lane = width / 2  # Center lane is in the middle of the window
-right_lane = width / 2 + road_width / 3  # Properly positioned right lane
-lanes = [left_lane, center_lane, right_lane]
+road_lane_width = game_road_width / 3  # Equal lane width
+game_road_left_lane = width_of_window / 2 - game_road_width / 3  # Properly positioned left lane
+game_road_middle_lane = width_of_window / 2  # Center lane is in the middle of the window
+right_lane = width_of_window / 2 + game_road_width / 3  # Properly positioned right lane
+lanes = [game_road_left_lane , game_road_middle_lane, right_lane]
 
 # road and edge markers
-road_left = (width - road_width) // 2  # Center the road
-road = (road_left, 0, road_width, height)
-left_edge_marker = (road_left - marker_width, 0, marker_width, height)
-right_edge_marker = (road_left + road_width, 0, marker_width, height)
+road_left = (width_of_window - game_road_width) // 2  # Center the road
+road = (road_left, 0, game_road_width, height_of_window)
+left_edge_marker = (road_left - road_lane_marker_width, 0, road_lane_marker_width, height_of_window)
+right_edge_marker = (road_left + game_road_width, 0, road_lane_marker_width, height_of_window)
 
 # for animating movement of the lane markers
 lane_marker_move_y = 0
 
 # player's starting coordinates
-player_x = center_lane
-player_y = height - 150  # Adjust for larger window
+player_x = game_road_middle_lane
+player_y = height_of_window - 150  # Adjust for larger window
 
 # frame settings
 clock = pygame.time.Clock()
@@ -78,7 +80,7 @@ class Vehicle(pygame.sprite.Sprite):
         
         # scale the image down so it's not wider than the lane
         image_scale = 65 / image.get_rect().width  # Larger for bigger window
-        new_width = image.get_rect().width * image_scale
+        new_width = image.get_rect().width* image_scale
         new_height = image.get_rect().height * image_scale
         self.image = pygame.transform.scale(image, (new_width, new_height))
         
@@ -118,8 +120,8 @@ def draw_text(text, font, color, surface, x, y):
 
 def countdown():
     for i in range(3, 0, -1):
-        screen.fill(green)
-        draw_text(str(i), pygame.font.Font(None, 144), white, screen, width // 2, height // 2)
+        the_game_screen.fill(the_grass_color)
+        draw_text(str(i), pygame.font.Font(None, 144), game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2)
         pygame.display.update()
         time.sleep(1)
 
@@ -131,42 +133,44 @@ def choose_level():
     selected_level = current_level_index  # Start with current level selected
     
     while choosing:
-        screen.fill(green)
-        draw_text('Choose Level', pygame.font.Font(None, 80), white, screen, width // 2, height // 2 - 200)
+        the_game_screen.fill(the_grass_color)
+        draw_text('Welcome To The Empire Car Racing Game', pygame.font.Font(None, 80), game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 - 250)
+
+        draw_text('Select your level', pygame.font.Font(None, 80), game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 - 150)
         
         # Draw level options with the selected one highlighted
         level_font = pygame.font.Font(None, 56)
         
         # Create a background for level selection area
-        level_bg_rect = pygame.Rect(width // 2 - 200, height // 2 - 100, 400, 300)
-        pygame.draw.rect(screen, (50, 150, 50), level_bg_rect)
-        pygame.draw.rect(screen, white, level_bg_rect, 3)
+        level_bg_rect = pygame.Rect(width_of_window // 2 - 200, height_of_window // 2 - 100, 400, 300)
+        pygame.draw.rect(the_game_screen, (50, 150, 50), level_bg_rect)
+        pygame.draw.rect(the_game_screen, game_text_color, level_bg_rect, 3)
         
         # Draw instructions for scrolling
         instruction_font = pygame.font.Font(None, 32)
-        instructions = "Use UP/DOWN arrows to select, ENTER to confirm"
-        draw_text(instructions, instruction_font, white, screen, width // 2, height // 2 + 250)
+        instructions = "Use UP/DOWN arrows keys to select, press ENTER key to confirm"
+        draw_text(instructions, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 250)
         
         # Draw level options left-justified with consistent spacing
-        y_pos = height // 2 - 70
+        y_pos = height_of_window // 2 - 70
         for i, lvl in enumerate(levels):
             level_text = f"{i+1}. {lvl['name']}"
             
             # Highlight selected level
             if i == selected_level:
                 # Draw selection background
-                select_rect = pygame.Rect(width // 2 - 180, y_pos - 20, 360, 50)
-                pygame.draw.rect(screen, (100, 200, 100), select_rect)
-                color = black  # Text color for selected item
+                select_rect = pygame.Rect(width_of_window // 2 - 180, y_pos - 20, 360, 50)
+                pygame.draw.rect(the_game_screen, (100, 200, 100), select_rect)
+                color = highlighted_text_color  # Text color for selected item
             else:
-                color = white  # Text color for unselected items
+                color = game_text_color  # Text color for unselected items
             
             # Left justify text but still center the block of text
             text_surface = level_font.render(level_text, True, color)
             text_rect = text_surface.get_rect()
-            text_rect.left = width // 2 - 150
+            text_rect.left = width_of_window // 2 - 150
             text_rect.centery = y_pos
-            screen.blit(text_surface, text_rect)
+            the_game_screen.blit(text_surface, text_rect)
             
             y_pos += 80  # Increased spacing between options
         
@@ -199,7 +203,7 @@ def choose_level():
     return True
 
 # Calculate lane movement distance based on the new lane positioning
-lane_move_distance = lane_width
+lane_move_distance = road_lane_width
 
 # game loop
 running = True
@@ -215,7 +219,7 @@ while running:
             
         # move the player's car using the left/right arrow keys
         if event.type == KEYDOWN:
-            if event.key == K_LEFT and player.rect.center[0] > left_lane:
+            if event.key == K_LEFT and player.rect.center[0] > game_road_left_lane :
                 player.rect.x -= lane_move_distance
             elif event.key == K_RIGHT and player.rect.center[0] < right_lane:
                 player.rect.x += lane_move_distance
@@ -235,33 +239,33 @@ while running:
             
     if not paused and not gameover:
         # draw the grass
-        screen.fill(green)
+        the_game_screen.fill(the_grass_color)
         
         # draw the road
-        pygame.draw.rect(screen, gray, road)
+        pygame.draw.rect(the_game_screen, game_road_color, road)
         
         # draw the edge markers
-        pygame.draw.rect(screen, yellow, left_edge_marker)
-        pygame.draw.rect(screen, yellow, right_edge_marker)
+        pygame.draw.rect(the_game_screen, road_lane_marks_color, left_edge_marker)
+        pygame.draw.rect(the_game_screen, road_lane_marks_color, right_edge_marker)
         
         # draw the lane markers - centered in each lane
         lane_marker_move_y += speed * 2
-        if lane_marker_move_y >= marker_height * 2:
+        if lane_marker_move_y >= road_lane_marker_height * 2:
             lane_marker_move_y = 0
             
         # Properly position the lane markers in the middle of each lane
-        for y in range(marker_height * -2, height, marker_height * 2):
+        for y in range(road_lane_marker_height * -2, height_of_window, road_lane_marker_height * 2):
             # Position markers in the center of each boundary between lanes
-            marker_x1 = left_lane + lane_width / 2 - marker_width / 2
-            marker_x2 = center_lane + lane_width / 2 - marker_width / 2
-            marker_x3 = right_lane - lane_width / 2 - marker_width / 2
+            marker_x1 = game_road_left_lane  + road_lane_width / 2 - road_lane_marker_width / 2
+            marker_x2 = game_road_middle_lane + road_lane_width / 2 - road_lane_marker_width / 2
+            marker_x3 = right_lane - road_lane_width / 2 - road_lane_marker_width / 2
             
-            pygame.draw.rect(screen, white, (marker_x1, y + lane_marker_move_y, marker_width, marker_height))
-            pygame.draw.rect(screen, white, (marker_x2, y + lane_marker_move_y, marker_width, marker_height))
-            pygame.draw.rect(screen, white, (marker_x3, y + lane_marker_move_y, marker_width, marker_height))
+            pygame.draw.rect(the_game_screen, game_text_color, (marker_x1, y + lane_marker_move_y, road_lane_marker_width, road_lane_marker_height))
+            pygame.draw.rect(the_game_screen, game_text_color, (marker_x2, y + lane_marker_move_y, road_lane_marker_width, road_lane_marker_height))
+            pygame.draw.rect(the_game_screen, game_text_color, (marker_x3, y + lane_marker_move_y, road_lane_marker_width, road_lane_marker_height))
             
         # draw the player's car
-        player_group.draw(screen)
+        player_group.draw(the_game_screen)
         
         # add a vehicle
         vehicle_limit = levels[current_level_index]["vehicle_limit"]
@@ -274,7 +278,7 @@ while running:
             if add_vehicle:
                 lane = random.choice(lanes)
                 image = random.choice(vehicle_images)
-                vehicle = Vehicle(image, lane, height / -2)
+                vehicle = Vehicle(image, lane, height_of_window / -2)
                 vehicle_group.add(vehicle)
         
         # make the vehicles move
@@ -282,34 +286,34 @@ while running:
             vehicle.rect.y += speed
             
             # remove vehicle once it goes off screen
-            if vehicle.rect.top >= height:
+            if vehicle.rect.top >= height_of_window:
                 vehicle.kill()
                 score += 1
                 if score > 0 and score % 5 == 0:
                     speed += 0.5  # Gradually increase speed
         
         # draw the vehicles
-        vehicle_group.draw(screen)
+        vehicle_group.draw(the_game_screen)
         
         # display the score and timer with proper positioning
         font = pygame.font.Font(pygame.font.get_default_font(), 32)  # Larger font size
         
         # Score display - properly positioned away from the road
         score_x = road_left // 2
-        text = font.render(f'Score: {score}', True, white)
+        text = font.render(f'Score: {score}', True, game_text_color)
         text_rect = text.get_rect()
-        text_rect.center = (score_x, height - 100)
-        screen.blit(text, text_rect)
+        text_rect.center = (score_x, height_of_window - 100)
+        the_game_screen.blit(text, text_rect)
 
         # Timer display with seconds - positioned below score
         elapsed_time = int(time.time() - start_time)
         remaining_time = max(0, level_time - elapsed_time)
         minutes = remaining_time // 60
         seconds = remaining_time % 60
-        timer_text = font.render(f'Time: {minutes:02d}:{seconds:02d}', True, white)
+        timer_text = font.render(f'Time: {minutes:02d}:{seconds:02d}', True, game_text_color)
         timer_rect = timer_text.get_rect()
-        timer_rect.center = (score_x, height - 50)
-        screen.blit(timer_text, timer_rect)
+        timer_rect.center = (score_x, height_of_window - 50)
+        the_game_screen.blit(timer_text, timer_rect)
         
         # check if there's a head on collision
         if pygame.sprite.spritecollide(player, vehicle_group, True):
@@ -318,29 +322,29 @@ while running:
                 
         # display game over
         if gameover:
-            screen.blit(crash, crash_rect)
-            pygame.draw.rect(screen, red, (0, 50, width, 100))
+            the_game_screen.blit(crash, crash_rect)
+            pygame.draw.rect(the_game_screen, game_over_color, (0, 50, width_of_window, 100))
             font = pygame.font.Font(pygame.font.get_default_font(), 32)  # Larger font
-            text = font.render('Game over. Play again? (Enter Y or N)', True, white)
+            text = font.render('Game over. Play again? (Enter Y or N)', True, game_text_color)
             text_rect = text.get_rect()
-            text_rect.center = (width / 2, 100)
-            screen.blit(text, text_rect)
+            text_rect.center = (width_of_window / 2, 100)
+            the_game_screen.blit(text, text_rect)
         
         # check if time is up (win condition)
         if elapsed_time >= level_time:
             gameover = True
-            pygame.draw.rect(screen, green, (0, 50, width, 100))
+            pygame.draw.rect(the_game_screen, the_grass_color, (0, 50, width_of_window, 100))
             font = pygame.font.Font(pygame.font.get_default_font(), 32)  # Larger font
             
             # If there's a next level available, offer to progress
             if current_level_index < len(levels) - 1:
-                text = font.render(f'Level Complete! Press N for next level or Q to quit', True, white)
+                text = font.render(f'Level Complete! Press N for next level or Q to quit', True, game_text_color)
             else:
-                text = font.render('All Levels Complete! Play again? (Y/N)', True, white)
+                text = font.render('All Levels Complete! Play again? (Y/N)', True, game_text_color)
                 
             text_rect = text.get_rect()
-            text_rect.center = (width / 2, 100)
-            screen.blit(text, text_rect)
+            text_rect.center = (width_of_window / 2, 100)
+            the_game_screen.blit(text, text_rect)
         
         pygame.display.update()
 
