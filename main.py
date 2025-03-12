@@ -359,40 +359,62 @@ def choose_level():
             text_rect.centery = y_pos
             the_game_screen.blit(text_surface, text_rect)
             
-            y_pos += 80  # space out level options vertically
+            y_pos += 80  # space out level options vertically aligned
         
-        pygame.display.update()
+        pygame.display.update()  # this updates the screen to show the changes 
 
-        # Handle events
+        
+
+        # the below is uded to handle user inputs like the arrow keys and enter 
         for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
+            if event.type == QUIT: # if the user closes the window 
+                pygame.quit()  # quit the game
                 return False
                 
             if event.type == KEYDOWN:
-                if event.key == K_UP:
+                if event.key == K_UP:  # move up in the level list
+
                     selected_level = (selected_level - 1) % len(the_game_levels)
-                elif event.key == K_DOWN:
+
+                elif event.key == K_DOWN: # used to move down in the level list
                     selected_level = (selected_level + 1) % len(the_game_levels)
-                elif event.key == K_RETURN:
-                    # Set the level
+                elif event.key == K_RETURN: # confirms the selctions
+                    
+
+                    # saving the selected level and its properties
+
                     user_selected_level_index = selected_level
                     current_level = the_game_levels[selected_level]["name"].lower()
                     level_duration = the_game_levels[selected_level]["time"]
-                    my_game_speed = the_game_levels[selected_level]["speed"]  # Set speed based on level
-                    choosing = False
-                elif event.key == K_ESCAPE:
+                    my_game_speed = the_game_levels[selected_level]["speed"]  # setting the speed of the selected level
+
+                    choosing = False  # exit the selection loop
+                elif event.key == K_ESCAPE: # quits the game when escape button is pressed
+
                     pygame.quit()
                     return False
 
-    countdown()
-    level_start_time = time.time()
-    return True
+    countdown()  # launches the countdown timer before the game starts
 
-# Calculate lane movement distance based on the new lane positioning
+    level_start_time = time.time()  # records the start time of the level
+    return True # indicates successful level selection
+
+
+
+# calculates the lane movement distance based on the lane width of the road
+
 lane_move_distance = road_lane_width
 
-# game loop
+
+
+
+
+#======================GAME==LOOP====================================
+
+# Handles the player input e.g moving the car, pausing the game
+# updates the game state e.g collision
+# Handles the game-over and level completion logic
+
 running = True
 if not choose_level():
     running = False
