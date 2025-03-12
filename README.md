@@ -75,6 +75,7 @@ Before running the game, you will need to install Python and the pygame library.
 This game was built using the pygame library. All fonts and game assets are created specifically for this game.
 
 The Images were Sourced from the previously done projects in Youtube, Reddit, Github and StackOverflow.
+The images are transparent to make them not be with  a  background color
 
 ### Contributing
 Feel free to fork this repository and contribute improvements! 
