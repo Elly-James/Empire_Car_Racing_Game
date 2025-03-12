@@ -24,7 +24,7 @@ pygame.mixer.init()
 # set_mode() sets the size of the display surface of the game
 # set_captions() assigns the title of the game window
 
-width_of_window = 1400  
+width_of_window = 1800  
 height_of_window = 1000  
 screen_dimensions = (width_of_window, height_of_window)
 the_game_screen = pygame.display.set_mode(screen_dimensions)
@@ -38,7 +38,7 @@ pygame.display.set_caption('The Empire Car Racing Game')
 
 
 game_road_color = (100, 100, 100)
-the_grass_color = (76, 208, 56)
+the_grass_color = (100, 150, 80)
 game_over_color = (200, 0, 0)
 game_text_color = (255, 255, 255)
 road_lane_marks_color = (255, 232, 0)
@@ -123,6 +123,22 @@ level_start_time = None # start time of the current level
 level_duration = None  # duration of the current level
 user_selected_level_index = 0  # index of the current level
 
+#===========Additional==code1========
+
+
+
+# Loading their images of the additionals
+
+barrier_image = pygame.image.load('the_game_images/barrier.png')
+coin_image = pygame.image.load('the_game_images/coin.png')
+tree_image = pygame.image.load('the_game_images/tree.png')
+
+# Scaling the images to the required size
+
+barrier_image = pygame.transform.scale(barrier_image, (50, 50))
+coin_image = pygame.transform.scale(coin_image, (30, 30))
+tree_image = pygame.transform.scale(tree_image, (100, 100))
+
 
 
 #=================GAME==LEVELS========================
@@ -176,7 +192,30 @@ class Vehicle(pygame.sprite.Sprite):
 
         self.rect.center = [x, y]
 
+class Barrier_of_the_Road(pygame.sprite.Sprite):
+    def __init__(self,image, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
 
+class Coin (pygame.sprite.Sprite):
+
+    def __init__(self,image, x,y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+class Tree (pygame.sprite.Sprite):
+
+    def __init__(self, image, x,y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+ 
 
 
 #==================PLAYER==VEHICLE==CLASS==========================
@@ -199,6 +238,11 @@ class PlayerVehicle(Vehicle):
 
 player_group = pygame.sprite.Group()
 vehicle_group = pygame.sprite.Group()
+
+barrier_group = pygame.sprite.Group()
+coin_group = pygame.sprite.Group()
+tree_group = pygame.sprite.Group()
+
 
 #=================PLAYER==CAR======================================
 
@@ -269,6 +313,28 @@ def countdown():
         pygame.display.update()
         time.sleep(1)
 
+def add_trees():
+    if not tree_group:
+        tree_spacing= 200
+        for y in range (-100, height_of_window, tree_spacing):
+            tree_left =Tree(tree_image, road_left_edge -100, y)
+            tree_right = Tree(tree_image, road_left_edge + game_road_width + 100, y)
+            tree_group.add(tree_left)
+            tree_group.add(tree_right)
+
+def add_barriers_and_coins():
+    if len(barrier_group) < 2: # adjusting the number of barriers
+        lane= random.choice(game_road_lanes)
+        barrier = Barrier_of_the_Road(barrier_image, lane,height_of_window/ -2)
+        barrier_group.add(barrier)
+
+    if len(coin_group) < 5: # adjusting the number of the coins on the road
+        lane= random.choice(game_road_lanes)
+        coin = Coin(coin_image, lane, height_of_window/ -2)
+        coin_group.add(coin)
+
+
+
 
 # ==============CHOOSE==LEVEL==FUNCTION===============================
 
@@ -303,7 +369,7 @@ def choose_level():
         
         # draws a rectangular background box for the level options
         level_bg_rect = pygame.Rect(width_of_window // 2 - 200, height_of_window // 2 - 100, 400, 300)
-        pygame.draw.rect(the_game_screen, (50, 150, 50), level_bg_rect)
+        pygame.draw.rect(the_game_screen, (70, 120, 60), level_bg_rect)
         pygame.draw.rect(the_game_screen, game_text_color, level_bg_rect, 3)
         
         # Displays the instructions for how to navigate the menu and the instructions of the game
@@ -333,6 +399,9 @@ def choose_level():
 
         instructions5 ="  5. Click the X section of the window to quit the game whenever needed"
         draw_text(instructions5, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 420)
+
+        instructions6 ="  6. Collision with the barrier ends the game, with the coin adds 5 points"
+        draw_text(instructions6, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 460)
 
         # Displaying the level options with the selected one highlighted
         
@@ -477,6 +546,8 @@ while running:
         # this ensures the drawing of the grass, the road and the lane markers
 
         the_game_screen.fill(the_grass_color)
+
+        tree_group.draw(the_game_screen)
         
         pygame.draw.rect(the_game_screen, game_road_color, road)
         
@@ -504,6 +575,39 @@ while running:
             pygame.draw.rect(the_game_screen, game_text_color, (marker_x1, y + lane_marker_offset_y, road_lane_marker_width, road_lane_marker_height))
             pygame.draw.rect(the_game_screen, game_text_color, (marker_x2, y + lane_marker_offset_y, road_lane_marker_width, road_lane_marker_height))
             pygame.draw.rect(the_game_screen, game_text_color, (marker_x3, y + lane_marker_offset_y, road_lane_marker_width, road_lane_marker_height))
+
+
+
+         # adding the trees, coins and barriers
+
+        add_trees()
+        add_barriers_and_coins()
+
+     
+
+        barrier_group.draw(the_game_screen)
+        coin_group.draw(the_game_screen)
+
+        for barrier in barrier_group:
+            barrier.rect.y += my_game_speed
+            if barrier.rect.top >= height_of_window:
+                barrier.kill()
+
+        for coin in coin_group:
+            coin.rect.y += my_game_speed
+            if coin.rect.top >= height_of_window:
+                coin.kill()
+               
+
+        if pygame.sprite.spritecollide(game_player_car, barrier_group, True):
+            is_the_gameover = True
+            crash_image_rect.center = [game_player_car.rect.center[0], game_player_car.rect.top]
+
+        coins_collected =pygame.sprite.spritecollide(game_player_car, coin_group, True)
+        player_score += len(coins_collected) * 5 
+
+
+
             
         # this draws the player car
 
@@ -536,7 +640,7 @@ while running:
                 vehicle.kill()
                 player_score += 1
                 if player_score > 0 and player_score % 5 == 0:
-                    my_game_speed += 0.5  # this gradual increase of the speed
+                    my_game_speed += 2  # this gradual increase of the speed
 
         
         # drawing the vehicles to the screen
@@ -548,10 +652,10 @@ while running:
         
         # positioning the score not to overlap into the road
 
-        score_x = road_left_edge // 2
-        text = font.render(f'Score: {player_score}', True, game_text_color)
+        score_x = road_left_edge // 2 -100
+        text = font.render(f'Score: {player_score}', True, (36,36,36))
         text_rect = text.get_rect()
-        text_rect.center = (score_x, height_of_window - 100)
+        text_rect.center = (score_x, 50)
         the_game_screen.blit(text, text_rect)
 
         # Displaying the timer  of the game just below the score
@@ -560,9 +664,9 @@ while running:
         time_remaining = max(0, level_duration - time_elapsed)
         minutes_remaining = time_remaining  // 60
         seconds_remaining = time_remaining  % 60
-        time_display_text = font.render(f'Time: {minutes_remaining:02d}:{seconds_remaining:02d}', True, game_text_color)
+        time_display_text = font.render(f'Time: {minutes_remaining:02d}:{seconds_remaining:02d}', True, (36,36,36))
         time_display_rect = time_display_text.get_rect()
-        time_display_rect.center = (score_x, height_of_window - 50)
+        time_display_rect.center = (score_x, 100)
         the_game_screen.blit(time_display_text, time_display_rect)
         
         # checks for any collisions on the game when playing
@@ -575,6 +679,11 @@ while running:
 
         if is_the_gameover:
             the_game_screen.blit(crash_image, crash_image_rect)
+
+            barrier_group.empty()
+            coin_group.empty()
+            tree_group.empty()
+
             pygame.draw.rect(the_game_screen, game_over_color, (0, 50, width_of_window, 100))
             font = pygame.font.Font(pygame.font.get_default_font(), 32)  
 
@@ -641,7 +750,7 @@ while running:
 
                         # restart the game from the beginning
                         is_the_gameover = False
-                        my_game_speed = 2
+                        my_game_speed = 4
                         player_score = 0
                         vehicle_group.empty()
                         game_player_car.rect.center = [player_start_x, player_start_y]

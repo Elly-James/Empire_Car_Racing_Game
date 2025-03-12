@@ -48,8 +48,10 @@ The game also implements pygame mixer to which implements a background music tha
  ### The Game Logic and Structure
 
  * **Game Loop:** The game runs inside a continuous loop that checks for player input, updates the game state, and redraws the screen.
- * **Collision Detection:** The game checks for collisions between the player's car and enemy vehicles. If a collision occurs, the game ends.
+ * **Collision Detection:** The game checks for collisions between the player's car and enemy vehicles or between the road barriers. If a collision occurs, the game ends.
  * **Enemy Vehicles:** Enemy vehicles are randomly generated within the available lanes. They move downward on the screen, and the player must avoid them.
+ * **Coin Collision:** If the player car collides with the coin, 5 points gets incremented on the score.
+  
   
  * **Level Progression:** As the player progresses through levels, the game speed increases, and the number of enemy vehicles also grows.
  * **Pause Functionality:** The game can be paused by pressing the spacebar, allowing the player to take a break.
