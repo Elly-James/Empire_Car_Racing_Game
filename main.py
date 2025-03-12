@@ -331,7 +331,8 @@ def choose_level():
         instructions4 ="4. Avoid colliding with other cars, and get as many points as possible"
         draw_text(instructions4, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 380)
 
-       
+        instructions5 ="  5. Click the X section of the window to quit the game whenever needed"
+        draw_text(instructions5, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 420)
 
         # Displaying the level options with the selected one highlighted
         
