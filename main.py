@@ -316,22 +316,22 @@ def choose_level():
         instructions = "INSTRUCTIONS"
         draw_text(instructions, instruction_font, (0,0,0), the_game_screen, width_of_window // 2, height_of_window // 2 + 220)
 
-        # INstruction for the selecting the level
-        instructions1 = "1. Use UP/DOWN arrows keys to select, press ENTER key to confirm"
+        # Instruction for the selecting the level
+        instructions1 ="1. Use UP/DOWN arrows keys to select, press ENTER key to confirm"
         draw_text(instructions1, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 260)
 
         # instructions for the game play
 
-        instructions2 = "2. In the game, use space bar to pause the game and to unpause game"
+        instructions2 ="  2. In the game, use space bar to pause the game and to unpause game"
         draw_text(instructions2, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 300)
 
-        instructions3 = "3. Use the left and right chevron buttons to change lanes for the car"
+        instructions3 ="3. Use the left and right chevron buttons to change lanes for the car"
         draw_text(instructions3, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 340)
 
-        instructions4 = "4. Avoid colliding with other cars, and get as many points as possible"
+        instructions4 ="4. Avoid colliding with other cars, and get as many points as possible"
         draw_text(instructions4, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 380)
 
-        instructions5 = "5. Use Q or Escape button to quit the game whenever the user wants to"
+        instructions5 ="  5. Use Q or Escape button to quit the game whenever the user wants to"
         draw_text(instructions5, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 420)
 
         # Display the level options with the selected one highlighted
