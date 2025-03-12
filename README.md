@@ -27,7 +27,7 @@ The game also implements pygame mixer to which implements a background music tha
  * **Spacebar:** Pause or unpause the game.
  * **Y:** Restart the game or a level.
  * **N:** Proceed to the next level.
- * **Q or ESC:** Quit the game.
+
   
 
 
