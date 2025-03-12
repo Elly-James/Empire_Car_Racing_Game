@@ -334,7 +334,7 @@ def choose_level():
         instructions5 ="  5. Use Q or Escape button to quit the game whenever the user wants to"
         draw_text(instructions5, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 420)
 
-        # Display the level options with the selected one highlighted
+        # Displaying the level options with the selected one highlighted
         
         
         y_pos = height_of_window // 2 - 70 # start position for the level options
