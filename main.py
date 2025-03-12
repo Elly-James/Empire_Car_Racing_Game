@@ -1,13 +1,28 @@
+# ===============LIBRARY==IMPORTS=================================
+
+# Here at the begining of everything, we are importing the libraries for this game which we would need
+# pygame is used to create the game, random for generating random numbers, and time which is used for timing 
+# The pygame.locals import *, it includes contants like QUIT to handle events of the game
+
+
 import pygame
 from pygame.locals import *
 import random
 import time
 
+#=================GAME==INITIALIZATION===============================
+
+# Here we are initializing the pygame and the mixer module for playing the music of the game
+
 pygame.init()
 pygame.mixer.init()
 
-# creating the window of the game
-# this are the dimensions of the window where the game is played
+
+#===================GAME==WINDOW==SETUP=========================
+
+# Here we are setting up the window dimensions where the game is going to be played
+# set_mode() sets the size of the display surface of the game
+# set_captions() assigns the title of the game window
 
 width_of_window = 1400  
 height_of_window = 1000  
@@ -15,7 +30,13 @@ screen_dimensions = (width_of_window, height_of_window)
 the_game_screen = pygame.display.set_mode(screen_dimensions)
 pygame.display.set_caption('The Empire Car Racing Game')
 
-# the game colors
+
+
+#=================COLORS=OF==THE==GAME===================
+
+# Defines the varoius game color
+
+
 game_road_color = (100, 100, 100)
 the_grass_color = (76, 208, 56)
 game_over_color = (200, 0, 0)
@@ -23,69 +44,145 @@ game_text_color = (255, 255, 255)
 road_lane_marks_color = (255, 232, 0)
 highlighted_text_color = (0, 0, 0)
 
-# road and marker sizes
-game_road_width = 900  # Adjusted for larger window
+
+# ===============ROAD==CONFIGURATION===========================
+
+# Here we are defining the width and height of the road, and the width of the road lane markers
+# The road and lane dimensions are calculated based on the window size  to ensure proper alignment
+
+
+game_road_width = 900  
 road_lane_marker_width = 10
 road_lane_marker_height = 50
 
-# lane coordinates (equally spaced)
-road_lane_width = game_road_width / 3  # Equal lane width
-game_road_left_lane = width_of_window / 2 - game_road_width / 3  # Properly positioned left lane
-game_road_middle_lane = width_of_window / 2  # Center lane is in the middle of the window
-game_road_right_lane = width_of_window / 2 + game_road_width / 3  # Properly positioned right lane
+# making sure the road lanes be properly spaced with equal width
+
+road_lane_width = game_road_width / 3  
+# properly positioning the lane on the left
+game_road_left_lane = width_of_window / 2 - game_road_width / 3  
+# properly positioning the middle lane on the center of the window
+game_road_middle_lane = width_of_window / 2  
+
+# properly positioning the lane on the right of the window
+game_road_right_lane = width_of_window / 2 + game_road_width / 3  
+
+# all the road lanes are stored in this list for easy access
 game_road_lanes = [game_road_left_lane , game_road_middle_lane, game_road_right_lane]
 
-# road and edge markers
-road_left_edge = (width_of_window - game_road_width) // 2  # Center the road
+#=================ROAD==LANES==MARKERS========================
+
+# Here we are defining the positions of the road lane markers on the road
+# road_left_edge is the X- coordinate of the left edge of the road
+# road_right_edge is the Y-coordinate of the right edge of the road
+# left_road_edge_marker and right_road_edge_marker are rectangles representing the left and right edges markers
+
+road_left_edge = (width_of_window - game_road_width) // 2  
+
 road = (road_left_edge, 0, game_road_width, height_of_window)
+
 left_road_edge_marker= (road_left_edge - road_lane_marker_width, 0, road_lane_marker_width, height_of_window)
+
 right_road_edge_marker = (road_left_edge + game_road_width, 0, road_lane_marker_width, height_of_window)
 
-# for animating movement of the lane markers
+
+# This is the lane marker animation that tracks the vertical offset for animating lane markers
+# Used to create the illusion for the movement for lane markers
 lane_marker_offset_y = 0
 
-# player's starting coordinates
-player_start_x = game_road_middle_lane
-player_start_y = height_of_window - 150  # Adjust for larger window
 
-# frame settings
+
+#=================PLAYER==SETTINGS========================
+
+# Here we are defining the player's car starting position 
+# player_start_x  is the X-coordinate  (middle lane)
+# player_start_y is the Y-coordinate (near the bottom of the screen)
+
+player_start_x = game_road_middle_lane
+player_start_y = height_of_window - 150  
+
+#=================FRAME==SETTINGS========================
+
+# Here we are defining the frame rate for the game where
+# pygame.time.Clock() manages the game loops frame rate.
+# frame_rate = 120 ensures the game runs smoothly at 120 frames per second (FPS)
+
 my_game_clock = pygame.time.Clock()
 frame_rate = 120
 
-# game settings
-is_the_gameover = False
-my_game_speed = 2
-player_score = 0
-current_level = None
-is_the_game_paused = False
-level_start_time = None
-level_duration = None
-user_selected_level_index = 0  # Track level index for progression
+#=================GAME==SETTINGS========================
 
-# Define levels
+
+# Here we are tracking the game state and its settings
+
+is_the_gameover = False # determines whether the game is over
+my_game_speed = 2 # the speed of the vehicle
+player_score = 0  # the score of the player
+current_level = None  # the current level of the game
+is_the_game_paused = False  # whether the game is paused
+level_start_time = None # start time of the current level
+level_duration = None  # duration of the current level
+user_selected_level_index = 0  # index of the current level
+
+
+
+#=================GAME==LEVELS========================
+
+# Here we are defining the levels of the game
+# Each level has its name, duration, speed and vehicle limit
+
 the_game_levels = [
     {"name": "Easy", "time": 60, "speed": 2, "vehicle_limit": 3},
     {"name": "Medium", "time": 90, "speed": 3, "vehicle_limit": 5},
     {"name": "Hard", "time": 120, "speed": 4, "vehicle_limit": 7}
 ]
 
-# Load music
-pygame.mixer.music.load('thegamemusic.mp3')
-pygame.mixer.music.play(-1)  # Loop indefinitely
+
+# ===============GAME==MUSIC======================================
+
+# Here we are loading the music for the game which continuously loops the background music of the game
+
+pygame.mixer.music.load('thegamemusic.mp3') # loads the music
+pygame.mixer.music.play(-1)  # plays the music in an infinite loop
+
+
+
+# ===============VEHICLE==CLASS======================================
+
+# Here in this class it represents vehicle (enemy car) in the game
+# pygame.sprite.Sprite is a base class in pygame for game objects
+# scaling is used to scale the vehicle image to resize it to fit into the lane width
+# we are also setting the position of the vehicle
 
 class Vehicle(pygame.sprite.Sprite):
     
     def __init__(self, image, x, y):
         pygame.sprite.Sprite.__init__(self)
         
-        # scale the image down so it's not wider than the lane
-        image_scale = 65 / image.get_rect().width  # Larger for bigger window
+        # here we are scaling the image so that it shouldn't be bigger than the lane
+        image_scale = 65 / image.get_rect().width  
+
         new_width = image.get_rect().width* image_scale
         new_height = image.get_rect().height * image_scale
+
+        # resizes the image to new dimensions specified by new_height and new_width
+        # pygame.transform.scale is a pygame method used to resize an image, and the image is the original that needs to be resized
+
         self.image = pygame.transform.scale(image, (new_width, new_height))
         
+        # gets and assigns the rectangular bounding area of the image
         self.rect = self.image.get_rect()
+
+        # sets the center of the rectangu
+
         self.rect.center = [x, y]
+
+
+
+
+#==================PLAYER==VEHICLE==CLASS==========================
+
+# Here we are creating the player's car class which inherits from Vehicle class
+# It loads the player car image and initializes its position
         
 class PlayerVehicle(Vehicle):
     
@@ -93,86 +190,176 @@ class PlayerVehicle(Vehicle):
         image = pygame.image.load('the_game_images/car.png')
         super().__init__(image, x, y)
         
-# sprite groups
+
+
+#=================SPRITE==GROUPS======================================
+
+# Here we are creating groups for the player and the enemy vehicles
+# pygame.sprite.Group()- Groups for managing multiple sprites
+
 player_group = pygame.sprite.Group()
 vehicle_group = pygame.sprite.Group()
 
-# create the player's car
+#=================PLAYER==CAR======================================
+
+# Here we are creating the player's car object and adding it to the player_group
+
+
 game_player_car = PlayerVehicle(player_start_x, player_start_y)
 player_group.add(game_player_car)
 
-# load the vehicle images
+
+
+#=================LOADING==VEHICLE==IMAGES============================
+
+# Here we are loading the images of enemy vehicles
+# Stores the loaded images in game_enemy_vehicle_images
+
 game_vehicle_image_files = ['pickup_truck.png', 'semi_trailer.png', 'taxi.png', 'van.png']
 game_enemy_vehicle_images = []
 for image_filename in game_vehicle_image_files:
     image = pygame.image.load('the_game_images/' + image_filename)
     game_enemy_vehicle_images.append(image)
     
-# load the crash image
+
+#=================LOADING==CRASH==IMAGE=============================
+
+# Here we are loading the image for crash
+# Used to display a crash animation when the player collides with an enemy vehicle
+
 crash_image = pygame.image.load('the_game_images/crash.png')
 crash_image_rect = crash_image.get_rect()
+
+
+
+#=================DRAWING==TEXT==FUNCTION============================
+
+# Here this function is used to draw text to the screen
+# It renders text with specified font, color and position
 
 def draw_text(text, font, color, surface, x, y):
     textobj = font.render(text, 1, color)
     textrect = textobj.get_rect()
+    # sets the center of the text rectangle to the given coordinates x,y
+
     textrect.center = (x, y)
+
+    # draws the textobject on the surface at the position of the text rectangle
+
     surface.blit(textobj, textrect)
 
+
+
+#=================COUNTDOWN==FUNCTION============================
+
+# Here this function is used to display a countdown before the game starts
+
+
 def countdown():
-    for i in range(3, 0, -1):
-        the_game_screen.fill(the_grass_color)
+    for i in range(3, 0, -1):  # loops from 3 down to 1 inclusive
+
+        the_game_screen.fill(the_grass_color) # fills the game screen with the background color
+
+        # draws the countdown num i on the screen, converts the num to str and sets the font style and size accordingly
+        # also the color is set, specifies the screen to draw on and centers the text horizontally and vertically
         draw_text(str(i), pygame.font.Font(None, 144), game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2)
+
+        # updates the display to show the changes
+        # pauses for 1 sec before displaying the next number in the countdown
         pygame.display.update()
         time.sleep(1)
 
+
+# ==============CHOOSE==LEVEL==FUNCTION===============================
+
+# Here this function is used to choose the level of the game
+
+
 def choose_level():
+
+    # declaring the varibales as global to allow modification of them anywhere in the function
+
     global current_level, level_start_time, level_duration, user_selected_level_index, my_game_speed
+
+    # initializing the level selection of the game
     
-    # Initialize level selection
     choosing = True
-    selected_level = user_selected_level_index  # Start with current level selected
+
+    # makes the game start with the previously selected level
+    selected_level = user_selected_level_index  
     
     while choosing:
+
+        # cleas the screen and sets the background color
         the_game_screen.fill(the_grass_color)
+
+        # displays title and the instructions for selecting game level
         draw_text('Welcome To The Empire Car Racing Game', pygame.font.Font(None, 80), game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 - 250)
 
         draw_text('Select your level', pygame.font.Font(None, 80), game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 - 150)
         
-        # Draw level options with the selected one highlighted
+        # draws the level options on the screen and highlights the selected ones
         level_font = pygame.font.Font(None, 56)
         
-        # Create a background for level selection area
+        # draws a rectangular background box for the level options
         level_bg_rect = pygame.Rect(width_of_window // 2 - 200, height_of_window // 2 - 100, 400, 300)
         pygame.draw.rect(the_game_screen, (50, 150, 50), level_bg_rect)
         pygame.draw.rect(the_game_screen, game_text_color, level_bg_rect, 3)
         
-        # Draw instructions for scrolling
+        # Displays the instructions for how to navigate the menu and the instructions of the game
+
         instruction_font = pygame.font.Font(None, 32)
-        instructions = "Use UP/DOWN arrows keys to select, press ENTER key to confirm"
-        draw_text(instructions, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 250)
+
+        # Main Heading for the instructions
+
+
+        instructions1 = "INSTRUCTIONS"
+        draw_text(instructions1, instruction_font, (0,0,0), the_game_screen, width_of_window // 2, height_of_window // 2 + 220)
+
+        # INstruction for the selecting the level
+        instructions2 = "1. Use UP/DOWN arrows keys to select, press ENTER key to confirm"
+        draw_text(instructions2, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 260)
+
+        # instructions for the game play
+
+        instructions3 = "2. In the game, use space bar to pause the game and to unpause game"
+        draw_text(instructions3, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 300)
+
+        instructions3 = "3. Use the left and right chevron buttons to change lanes for the car"
+        draw_text(instructions3, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 340)
+
+        instructions3 = "4. Avoid colliding with other cars, and get as many points as possible"
+        draw_text(instructions3, instruction_font, game_text_color, the_game_screen, width_of_window // 2, height_of_window // 2 + 380)
+
+        # Display the level options with the selected one highlighted
         
-        # Draw level options left-justified with consistent spacing
-        y_pos = height_of_window // 2 - 70
-        for i, lvl in enumerate(the_game_levels):
-            level_text = f"{i+1}. {lvl['name']}"
+        
+        y_pos = height_of_window // 2 - 70 # start position for the level options
+
+        for i, lvl in enumerate(the_game_levels): # loops through all levels
+            level_text = f"{i+1}. {lvl['name']}" # displays the level name with numbering them
             
-            # Highlight selected level
+            # if the current level is selected, higlight the selected level with a background box 
             if i == selected_level:
                 # Draw selection background
                 select_rect = pygame.Rect(width_of_window // 2 - 180, y_pos - 20, 360, 50)
-                pygame.draw.rect(the_game_screen, (100, 200, 100), select_rect)
-                color = highlighted_text_color  # Text color for selected item
+
+                pygame.draw.rect(the_game_screen, (100, 200, 100), select_rect) # highlighting color
+
+                color = highlighted_text_color  # us the given color for the selected text level
             else:
-                color = game_text_color  # Text color for unselected items
+                color = game_text_color  # default coloring for the unselected text level
             
-            # Left justify text but still center the block of text
+            
+            # rendering and positioning of the level text
+             
             text_surface = level_font.render(level_text, True, color)
             text_rect = text_surface.get_rect()
             text_rect.left = width_of_window // 2 - 150
             text_rect.centery = y_pos
             the_game_screen.blit(text_surface, text_rect)
             
-            y_pos += 80  # Increased spacing between options
+            y_pos += 80  # space out level options vertically
         
         pygame.display.update()
 
