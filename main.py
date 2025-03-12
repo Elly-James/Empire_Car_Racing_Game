@@ -416,17 +416,29 @@ lane_move_distance = road_lane_width
 # Handles the game-over and level completion logic
 
 running = True
+
+# this checks if the game should start by calling the function choose_level, if the function returns returns false the game stops immediately
+
 if not choose_level():
     running = False
 
+# this is the main loop of our game, it runs as long as running is true
+
 while running:
-    my_game_clock.tick(frame_rate)
+    my_game_clock.tick(frame_rate) # this controls the speed of the game in FPS
+
+    # Handles the user input e.g if the user quits the game it stops running
     
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False
             
-        # move the player's car using the left/right arrow keys
+        # the below is used to move the player car and pausing the game
+        # if left or right arrow keys are pressed the car moves left or right
+        # pressing the space bar pauses the game
+
+
+
         if event.type == KEYDOWN:
             if event.key == K_LEFT and game_player_car.rect.center[0] > game_road_left_lane :
                 game_player_car.rect.x -= lane_move_distance
@@ -435,36 +447,53 @@ while running:
             elif event.key == K_SPACE:
                 is_the_game_paused = not is_the_game_paused
                 
-            # check if there's a side swipe collision after changing lanes
+            
+
+            # this checks if there is any collision of the player car with the other vehicles, if so the game ends where is the game over = true
+
             for vehicle in vehicle_group:
                 if pygame.sprite.collide_rect(game_player_car, vehicle):
                     is_the_gameover = True
+
+                    # handles the crash by positioning the car after collision
+
                     if event.key == K_LEFT:
                         game_player_car.rect.left = vehicle.rect.right
                         crash_image_rect.center = [game_player_car.rect.left, (game_player_car.rect.center[1] + vehicle.rect.center[1]) / 2]
                     elif event.key == K_RIGHT:
                         game_player_car.rect.right = vehicle.rect.left
                         crash_image_rect.center = [game_player_car.rect.right, (game_player_car.rect.center[1] + vehicle.rect.center[1]) / 2]
+
+
+
+    
             
     if not is_the_game_paused and not is_the_gameover:
-        # draw the grass
+        
+
+        # this ensures the drawing of the grass, the road and the lane markers
+
         the_game_screen.fill(the_grass_color)
         
-        # draw the road
         pygame.draw.rect(the_game_screen, game_road_color, road)
         
-        # draw the edge markers
         pygame.draw.rect(the_game_screen, road_lane_marks_color, left_road_edge_marker)
         pygame.draw.rect(the_game_screen, road_lane_marks_color, right_road_edge_marker)
         
-        # draw the lane markers - centered in each lane
+        # drawing the lane markers centered in each lane
+
         lane_marker_offset_y += my_game_speed * 2
         if lane_marker_offset_y >= road_lane_marker_height * 2:
             lane_marker_offset_y = 0
+
+        
             
-        # Properly position the lane markers in the middle of each lane
+        # positions the lane markers 
         for y in range(road_lane_marker_height * -2, height_of_window, road_lane_marker_height * 2):
-            # Position markers in the center of each boundary between lanes
+
+
+            # positions the road lane markers at the boundaries well
+
             marker_x1 = game_road_left_lane  + road_lane_width / 2 - road_lane_marker_width / 2
             marker_x2 = game_road_middle_lane + road_lane_width / 2 - road_lane_marker_width / 2
             marker_x3 = game_road_right_lane - road_lane_width / 2 - road_lane_marker_width / 2
@@ -473,11 +502,14 @@ while running:
             pygame.draw.rect(the_game_screen, game_text_color, (marker_x2, y + lane_marker_offset_y, road_lane_marker_width, road_lane_marker_height))
             pygame.draw.rect(the_game_screen, game_text_color, (marker_x3, y + lane_marker_offset_y, road_lane_marker_width, road_lane_marker_height))
             
-        # draw the player's car
+        # this draws the player car
+
         player_group.draw(the_game_screen)
         
-        # add a vehicle
+        # this adds a vehicle 
         vehicle_limit = the_game_levels[user_selected_level_index]["vehicle_limit"]
+
+        # adds vehicles to the game, randomly ensuring the vehicle count stays below the vehicle_limit
         if len(vehicle_group) < vehicle_limit:
             should_add_vehicle = True
             for vehicle in vehicle_group:
@@ -490,31 +522,37 @@ while running:
                 vehicle = Vehicle(image, random_lane_center, height_of_window / -2)
                 vehicle_group.add(vehicle)
         
-        # make the vehicles move
+        # moves the vehicles down the screen with the  speed determined by  my_game_speed
+
         for vehicle in vehicle_group:
             vehicle.rect.y += my_game_speed
             
-            # remove vehicle once it goes off screen
+            # this ensures the vehicle disppears once it goes off the screen
+
             if vehicle.rect.top >= height_of_window:
                 vehicle.kill()
                 player_score += 1
                 if player_score > 0 and player_score % 5 == 0:
-                    my_game_speed += 0.5  # Gradually increase speed
+                    my_game_speed += 0.5  # this gradual increase of the speed
+
         
-        # draw the vehicles
+        # drawing the vehicles to the screen
         vehicle_group.draw(the_game_screen)
         
-        # display the score and timer with proper positioning
-        font = pygame.font.Font(pygame.font.get_default_font(), 32)  # Larger font size
+        # displays the score and timer for the game
+
+        font = pygame.font.Font(pygame.font.get_default_font(), 32)  
         
-        # Score display - properly positioned away from the road
+        # positioning the score not to overlap into the road
+
         score_x = road_left_edge // 2
         text = font.render(f'Score: {player_score}', True, game_text_color)
         text_rect = text.get_rect()
         text_rect.center = (score_x, height_of_window - 100)
         the_game_screen.blit(text, text_rect)
 
-        # Timer display with seconds - positioned below score
+        # Displaying the timer  of the game just below the score
+
         time_elapsed = int(time.time() - level_start_time)
         time_remaining = max(0, level_duration - time_elapsed)
         minutes_remaining = time_remaining  // 60
@@ -524,28 +562,33 @@ while running:
         time_display_rect.center = (score_x, height_of_window - 50)
         the_game_screen.blit(time_display_text, time_display_rect)
         
-        # check if there's a head on collision
+        # checks for any collisions on the game when playing
+
         if pygame.sprite.spritecollide(game_player_car, vehicle_group, True):
             is_the_gameover = True
             crash_image_rect.center = [game_player_car.rect.center[0], game_player_car.rect.top]
                 
-        # display game over
+        #  displays game over when thre is a collision and the message for the game over
+
         if is_the_gameover:
             the_game_screen.blit(crash_image, crash_image_rect)
             pygame.draw.rect(the_game_screen, game_over_color, (0, 50, width_of_window, 100))
-            font = pygame.font.Font(pygame.font.get_default_font(), 32)  # Larger font
+            font = pygame.font.Font(pygame.font.get_default_font(), 32)  
+
             text = font.render('Game over. Play again? (Enter Y or N)', True, game_text_color)
             text_rect = text.get_rect()
             text_rect.center = (width_of_window / 2, 100)
             the_game_screen.blit(text, text_rect)
         
-        # check if time is up (win condition)
+        # the player car wins if there is no collisions and the timer is up 
+
         if time_elapsed >= level_duration:
             is_the_gameover = True
             pygame.draw.rect(the_game_screen, the_grass_color, (0, 50, width_of_window, 100))
-            font = pygame.font.Font(pygame.font.get_default_font(), 32)  # Larger font
+            font = pygame.font.Font(pygame.font.get_default_font(), 32)  
             
-            # If there's a next level available, offer to progress
+            # Enables the player to progress to the next level when they have finished and won the current level
+
             if user_selected_level_index < len(the_game_levels) - 1:
                 text = font.render(f'Level Complete! Press N for next level or Q to quit', True, game_text_color)
             else:
@@ -555,9 +598,16 @@ while running:
             text_rect.center = (width_of_window / 2, 100)
             the_game_screen.blit(text, text_rect)
         
-        pygame.display.update()
+        pygame.display.update() # updates the game screen for the changes
 
-    # Handle game over state
+
+
+
+
+#================================================================
+
+    # handles the game over state of the game
+
     while is_the_gameover:
         my_game_clock.tick(frame_rate)
         for event in pygame.event.get():
@@ -566,12 +616,16 @@ while running:
                 running = False
                 
             if event.type == KEYDOWN:
-                # Win condition - time completed
+               # checks if the level timer is over, if yes, the game ends and the player proceeds to the next level or restart
+
                 if time_elapsed >= level_duration:
                     if user_selected_level_index < len(the_game_levels) - 1 and event.key == K_n:
-                        # Move to next level
+                       
+                       # moving to the next level of the game
+
                         is_the_gameover = False
-                        my_game_speed = the_game_levels[user_selected_level_index + 1]["speed"]  # Set speed for next level
+                        my_game_speed = the_game_levels[user_selected_level_index + 1]["speed"]  # setting up speed for the next level
+
                         player_score = 0
                         vehicle_group.empty()
                         game_player_car.rect.center = [player_start_x, player_start_y]
@@ -581,7 +635,8 @@ while running:
                         countdown()
                         level_start_time = time.time()
                     elif event.key == K_y:
-                        # Restart from level selection
+
+                        # restart the game from the beginning
                         is_the_gameover = False
                         my_game_speed = 2
                         player_score = 0
@@ -592,10 +647,14 @@ while running:
                     elif event.key == K_q or event.key == K_n or event.key == K_ESCAPE:
                         is_the_gameover = False
                         running = False
-                # Game over condition
+
+                    # in a game over condition
                 else:
                     if event.key == K_y:
-                        # Restart from level selection
+                        
+
+                        # restart the game from the beginning
+
                         is_the_gameover = False
                         my_game_speed = 2
                         player_score = 0
@@ -607,4 +666,6 @@ while running:
                         is_the_gameover = False
                         running = False
 
-pygame.quit()
+pygame.quit() # quits the game when the loop ends
+
+#================================================================
